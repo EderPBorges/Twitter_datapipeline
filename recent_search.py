@@ -19,20 +19,24 @@ def create_url():
     # in_reply_to_user_id, lang, non_public_metrics, organic_metrics,
     # possibly_sensitive, promoted_metrics, public_metrics, referenced_tweets,
     # source, text, and withheld
+    # campos para a pesquisa na api (consultar a documentação da API para verificar demais campos)
     tweet_fields = "tweet.fields=author_id,conversation_id,created_at,id,in_reply_to_user_id,public_metrics,text"
+    # requisitos dos usuarios
     user_fields = "expansions=author_id&user.fields=id,name,username,created_at"
+    # filtrando a data inicial e final da pesquisa
     filters = "start_time=2022-05-24T00:00:00.00Z&end_time=2022-05-29T00:00:00.00Z"
+    # url da api e os filtros para a pesquisa
     url = "https://api.twitter.com/2/tweets/search/recent?query={}&{}&{}&{}".format(
         query, tweet_fields, user_fields, filters
     )
     return url
 
-
+# criando o token (API)
 def create_headers(bearer_token):
     headers = {"Authorization": "Bearer {}".format(bearer_token)}
     return headers
 
-
+# conectando ao url e passando o cabeçalho
 def connect_to_endpoint(url, headers):
     response = requests.request("GET", url, headers=headers)
     print(response.status_code)
@@ -40,7 +44,7 @@ def connect_to_endpoint(url, headers):
         raise Exception(response.status_code, response.text)
     return response.json()
 
-
+# metodo recursivo de paginação (obter as proximas paginas da pesquisa)
 def paginate(url, headers, next_token=""):
     if next_token:
         full_url = f"{url}&next_token={next_token}"
