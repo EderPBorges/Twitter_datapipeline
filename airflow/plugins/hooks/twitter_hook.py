@@ -2,7 +2,7 @@ from airflow.hooks.http_hook import HttpHook
 import requests
 import json
 
-
+# criando um gancho para a conexão
 class TwitterHook(HttpHook):
 
     def __init__(self, query, conn_id=None, start_time=None, end_time=None):
@@ -32,12 +32,14 @@ class TwitterHook(HttpHook):
         )
         return url
 
+    # conectando ao url e passando o cabeçalho
     def connect_to_endpoint(self, url, session):
         response = requests.Request("GET", url)
         prep = session.prepare_request(response)
         self.log.info(f"URL: {url}")
         return self.run_and_check(session, prep, {}).json()
 
+    # metodo recursivo de paginação (obter as proximas paginas da pesquisa)
     def paginate(self, url, session, next_token=""):
         if next_token:
             full_url = f"{url}&next_token={next_token}"
